@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SampleDataGeneratorLibrary;
 
-namespace SampleDataGeneratorLibrary
+public class AIGenerator
 {
-    class AIGenerator
+    private readonly string modelPath;
+
+    public AIGenerator(string modelPath)
     {
+        if (File.Exists(modelPath) == false)
+        {
+            throw new ArgumentException("The path to the model was not found.");
+        }
+        this.modelPath = modelPath;
     }
 }

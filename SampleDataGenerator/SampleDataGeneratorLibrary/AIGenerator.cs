@@ -1,4 +1,8 @@
-﻿using System.Text.Json;
+﻿using LLama;
+using LLama.Common;
+using LLama.Sampling;
+using System.Text;
+using System.Text.Json;
 
 namespace SampleDataGeneratorLibrary;
 
@@ -17,7 +21,73 @@ public class AIGenerator
 
     public async Task<JsonDocument> GetSampleDataAsync(int recordCount, JsonDocument sampleDocument)
     {
-        throw new NotImplementedException();
+
+        ModelParams parameters = new(modelPath)
+        {
+            ContextSize = 4096,
+            GpuLayerCount = 0,
+            BatchSize = 512,
+            UseMemorymap = true
+        };
+        using var model = LLamaWeights.LoadFromFile(parameters);
+        using var context = model.CreateContext(parameters);
+        StatelessExecutor executor = new(model,parameters);
+
+        InferenceParams inferenceParams = new()
+        {
+            MaxTokens = 4096,
+            SamplingPipeline = new DefaultSamplingPipeline
+            {
+                Temperature = 0.6f
+            },
+            AntiPrompts = ["<|eot_id|>","<|end_of_text|>"]
+        };
+
+        List<JsonElement> records = new();
+        int batchSize = 10;
+        int numberOfBatches = (int)Math.Ceiling((double)recordCount / batchSize);
+
+        for (int batchNumber = 1; batchNumber < numberOfBatches; batchNumber++)
+        {
+            int recordsInThisBatch = Math.Min(batchSize, recordCount - (batchNumber * batchSize));
+            string prompt = BuildSampleDataPrompt(recordsInThisBatch, sampleDocument);
+
+            StringBuilder fullResponse = new();
+            await foreach(var text in executor.InferAsync(prompt, inferenceParams))
+            {
+                fullResponse.Append(text);
+
+            }
+            string? jsonData = ExtractJson(fullResponse.ToString());
+
+            if (jsonData is null)
+            {
+                Console.WriteLine($"bATCH number {batchNumber + 1} ignored - bad data.");
+                continue;
+            }
+
+            try
+            {
+                JsonDocument jsonDoc = JsonDocument.Parse(jsonData);
+                if (jsonDoc.RootElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach(var record in jsonDoc.RootElement.EnumerateArray())
+                    {
+                        records.Add(record.Clone());
+                    }
+                }
+            }
+            catch 
+            {
+
+                Console.WriteLine("No valid records found in JSON"); 
+            }
+        }
+
+        string jsonString = JsonSerializer.Serialize(records);
+        JsonDocument output = JsonDocument.Parse(jsonString);
+
+        return output;
     }
 
     private string BuildSampleDataPrompt(int recordCount, JsonDocument sampleDocument)

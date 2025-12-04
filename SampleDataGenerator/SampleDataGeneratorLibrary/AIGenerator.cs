@@ -8,7 +8,7 @@ namespace SampleDataGeneratorLibrary;
 
 public class AIGenerator
 {
-    private readonly string modelPath;
+    private readonly string modelPath; 
 
     public AIGenerator(string modelPath)
     {
@@ -47,10 +47,11 @@ public class AIGenerator
         int batchSize = 10;
         int numberOfBatches = (int)Math.Ceiling((double)recordCount / batchSize);
 
-        for (int batchNumber = 1; batchNumber < numberOfBatches; batchNumber++)
+        for (int batchNumber = 0; batchNumber < numberOfBatches; batchNumber++)
         {
             int recordsInThisBatch = Math.Min(batchSize, recordCount - (batchNumber * batchSize));
-            string prompt = BuildSampleDataPrompt(recordsInThisBatch, sampleDocument);
+            int startingId = batchNumber * batchSize + 1;
+            string prompt = BuildSampleDataPrompt(startingId,recordsInThisBatch, sampleDocument);
 
             StringBuilder fullResponse = new();
             await foreach(var text in executor.InferAsync(prompt, inferenceParams))
@@ -62,7 +63,7 @@ public class AIGenerator
 
             if (jsonData is null)
             {
-                Console.WriteLine($"bATCH number {batchNumber + 1} ignored - bad data.");
+                Console.WriteLine($"Batch number {batchNumber + 1} ignored - bad data.");
                 continue;
             }
 
@@ -90,7 +91,7 @@ public class AIGenerator
         return output;
     }
 
-    private string BuildSampleDataPrompt(int recordCount, JsonDocument sampleDocument)
+    private string BuildSampleDataPrompt(int startingId, int recordCount, JsonDocument sampleDocument)
     {
         string sampleAsString = sampleDocument.RootElement.ToString();
         string prompt = $@" <|start_header_id|>system<|end_header_id|>
@@ -110,9 +111,14 @@ CRITICAL REQUIREMNETS:
     - Email addresses: Use realistic emails (e.g., Muhammedshaheem@gmail.com)
     - Dates: Use valid date formats (e.g., ""21-04-2003"")
     - Numbers: Use realistic numbers non zero numbers unless a zero is called for 
-5. DO NOT include any text, explanation, or markdown before or after the JSON array
-6. Ensure valid JSON syntax with proper commas between objects
-7. Make each record unique with different values
+5. Do not ever include example datas in actual data generation. 
+6. Generate varied information, including using rare edge cases. Avoid repeating patterns within the response  
+7. DO NOT include any text, explanation, or markdown before or after the JSON array
+8. Ensure valid JSON syntax with proper commas between objects
+9. Make each record unique with different values
+10. If a property name requires a numeric Id, these records should start with the id of {startingId} and increment by 1 each time 
+11. If an Id or similar unique value is required. Ensure that it is unique, utilize the value of {startingId}
+12. If an Guid or similar unique value is required. Ensure that it is unique, utilize the value of {startingId}
 Your response must start with [ and end with ]
 
 <|eot_id|><|start_header_id|>assistant<|end_header_id|>

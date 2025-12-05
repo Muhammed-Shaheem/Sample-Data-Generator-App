@@ -20,7 +20,7 @@
 
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
             <Label Content="Number of records" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
-            <TextBox Width="200" HorizontalAlignment="Left" Padding="5"></TextBox>
+            <TextBox Name="NumberOfRecords" Width="200" HorizontalAlignment="Left" Padding="5"></TextBox>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Margin="0,0,0,15">
@@ -31,7 +31,7 @@
         
         <StackPanel Grid.Row="3" Margin="0,0,0,15">
             <Button x:Name="SubmitButton" Content="Submit" Width="120" Height="35" HorizontalAlignment="Left"
-                    FontWeight="SemiBold" Background="#007acc" Foreground="white" BorderThickness="0"></Button>
+                    FontWeight="SemiBold" Background="#007acc" Foreground="white" BorderThickness="0" Click="SubmitButton_Click"></Button>
         </StackPanel>
         
         

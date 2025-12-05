@@ -4,9 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DataGenAI.Desktop"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        mc:Ignorable="d" FontSize="14" FontFamily="Consolas"
+        Title="Data Generator" Height="650" Width="800">
+    <Grid Margin="19,20,21,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <TextBlock Grid.Row="0" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"
+                   HorizontalAlignment="Center">Sample Data Generator</TextBlock>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <Label Content="Number of records" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
+            <TextBox Width="200" HorizontalAlignment="Left" Padding="5"></TextBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" Margin="0,0,0,15">
+            <Label Content="Sample Structure" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
+            <TextBox x:Name="SampleStructure" Height="120" TextWrapping="Wrap" AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto" Padding="5"></TextBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="3" Margin="0,0,0,15">
+            <Button x:Name="SubmitButton" Content="Submit" Width="120" Height="35" HorizontalAlignment="Left"
+                    FontWeight="SemiBold" Background="#007acc" Foreground="white" BorderThickness="0"></Button>
+        </StackPanel>
+        
+        
+        <StackPanel Grid.Row="4" Margin="0,0,0,15">
+            <Label Content="Results" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
+            <TextBox x:Name="Results" Height="180" TextWrapping="Wrap" IsReadOnly="True"
+         VerticalScrollBarVisibility="Auto" Padding="5" FontSize="12"></TextBox>
+        </StackPanel>
+        
+        
     </Grid>
 </Window>

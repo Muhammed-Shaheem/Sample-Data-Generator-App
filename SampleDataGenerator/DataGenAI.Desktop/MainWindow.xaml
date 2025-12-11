@@ -4,43 +4,171 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DataGenAI.Desktop"
-        mc:Ignorable="d" FontSize="14" FontFamily="Consolas"
-        Title="Data Generator" Height="650" Width="800">
-    <Grid Margin="19,20,21,20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
+        mc:Ignorable="d"
+        Title="Data Generator" Height="700" Width="900"
+        Background="#F5F5F5">
 
-        <TextBlock Grid.Row="0" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"
-                   HorizontalAlignment="Center">Sample Data Generator</TextBlock>
+    <Window.Resources>
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#007acc"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#007acc"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <StackPanel Grid.Row="1" Margin="0,0,0,15">
-            <Label Content="Number of records" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
-            <TextBox Name="NumberOfRecords" Width="200" HorizontalAlignment="Left" Padding="5"></TextBox>
-        </StackPanel>
-        
-        <StackPanel Grid.Row="2" Margin="0,0,0,15">
-            <Label Content="Sample Structure" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
-            <TextBox x:Name="SampleStructure" Height="120" TextWrapping="Wrap" AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto" Padding="5"></TextBox>
-        </StackPanel>
-        
-        <StackPanel Grid.Row="3" Margin="0,0,0,15">
-            <Button x:Name="SubmitButton" Content="Submit" Width="120" Height="35" HorizontalAlignment="Left"
-                    FontWeight="SemiBold" Background="#007acc" Foreground="white" BorderThickness="0" Click="SubmitButton_Click"></Button>
-        </StackPanel>
-        
-        
-        <StackPanel Grid.Row="4" Margin="0,0,0,15">
-            <Label Content="Results" FontWeight="SemiBold" Margin="0,0,0,5"></Label>
-            <TextBox x:Name="Results" Height="180" TextWrapping="Wrap" IsReadOnly="True"
-         VerticalScrollBarVisibility="Auto" Padding="5" FontSize="12"></TextBox>
-        </StackPanel>
-        
-        
-    </Grid>
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#007acc"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4" 
+                                Padding="20,10">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#005a9e"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#004578"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Modern Label Style -->
+        <Style x:Key="ModernLabel" TargetType="Label">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="White" Margin="30" CornerRadius="8">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.1" 
+                            BlurRadius="20" ShadowDepth="0"/>
+        </Border.Effect>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="40,35">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,30">
+                    <TextBlock FontSize="32" FontWeight="Light" 
+                          FontFamily="Segoe UI" Foreground="#333333"
+                          HorizontalAlignment="Left">
+                    Sample Data Generator
+                    </TextBlock>
+                    <Rectangle Height="3" Fill="#007acc" Width="80" 
+                          HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                </StackPanel>
+
+                <!-- Number of Records -->
+                <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                    <Label Content="Number of Records" 
+                       Style="{StaticResource ModernLabel}" 
+                       Margin="0,0,0,8"/>
+                    <TextBox Name="NumberOfRecords" 
+                        Width="250" 
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource ModernTextBox}"
+                        Text="100"/>
+                </StackPanel>
+
+                <!-- Sample Structure -->
+                <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                    <Label Content="Sample Structure (JSON)" 
+                       Style="{StaticResource ModernLabel}" 
+                       Margin="0,0,0,8"/>
+                    <Border BorderBrush="#E0E0E0" BorderThickness="1" 
+                       CornerRadius="4" Background="White">
+                        <TextBox x:Name="SampleStructure" 
+                            Height="150" 
+                            TextWrapping="Wrap" 
+                            AcceptsReturn="True"
+                            VerticalScrollBarVisibility="Auto"
+                            Style="{StaticResource ModernTextBox}"
+                            BorderThickness="0"
+                            FontFamily="Consolas"
+                            FontSize="13">
+                            <TextBox.Text>{
+  "name": "string",
+  "email": "string",
+  "age": "number",
+  "city": "string",
+  "isActive": "boolean"
+}</TextBox.Text>
+                        </TextBox>
+                    </Border>
+                </StackPanel>
+
+                <!-- Submit Button -->
+                <StackPanel Grid.Row="3" Margin="0,0,0,25">
+                    <Button x:Name="SubmitButton" 
+                       Content="Generate Data" 
+                       Width="160" 
+                       Height="40" 
+                       HorizontalAlignment="Left"
+                       Style="{StaticResource ModernButton}"
+                       Click="SubmitButton_Click"/>
+                </StackPanel>
+
+                <!-- Results -->
+                <StackPanel Grid.Row="4" Margin="0,0,0,0">
+                    <Label Content="Generated Results" 
+                       Style="{StaticResource ModernLabel}" 
+                       Margin="0,0,0,8"/>
+                    <Border BorderBrush="#E0E0E0" BorderThickness="1" 
+                       CornerRadius="4" Background="#FAFAFA">
+                        <TextBox x:Name="Results" 
+                            Height="200"
+                            TextWrapping="Wrap" 
+                            IsReadOnly="True"
+                            Style="{StaticResource ModernTextBox}"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            Foreground="#555555"
+                            VerticalScrollBarVisibility="Auto"
+                            AcceptsReturn="True"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Border>
 </Window>

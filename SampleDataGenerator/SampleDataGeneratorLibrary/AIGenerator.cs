@@ -8,7 +8,7 @@ namespace SampleDataGeneratorLibrary;
 
 public class AIGenerator
 {
-    private readonly string modelPath; 
+    private readonly string modelPath;
 
     public AIGenerator(string modelPath)
     {
@@ -31,7 +31,7 @@ public class AIGenerator
         };
         using var model = LLamaWeights.LoadFromFile(parameters);
         using var context = model.CreateContext(parameters);
-        StatelessExecutor executor = new(model,parameters);
+        StatelessExecutor executor = new(model, parameters);
 
         InferenceParams inferenceParams = new()
         {
@@ -40,7 +40,7 @@ public class AIGenerator
             {
                 Temperature = 0.6f
             },
-            AntiPrompts = ["<|eot_id|>","<|end_of_text|>"]
+            AntiPrompts = ["<|eot_id|>", "<|end_of_text|>"]
         };
 
         List<JsonElement> records = new();
@@ -51,10 +51,10 @@ public class AIGenerator
         {
             int recordsInThisBatch = Math.Min(batchSize, recordCount - (batchNumber * batchSize));
             int startingId = batchNumber * batchSize + 1;
-            string prompt = BuildSampleDataPrompt(startingId,recordsInThisBatch, sampleDocument);
+            string prompt = BuildSampleDataPrompt(startingId, recordsInThisBatch, sampleDocument);
 
             StringBuilder fullResponse = new();
-            await foreach(var text in executor.InferAsync(prompt, inferenceParams))
+            await foreach (var text in executor.InferAsync(prompt, inferenceParams))
             {
                 fullResponse.Append(text);
 
@@ -72,16 +72,16 @@ public class AIGenerator
                 JsonDocument jsonDoc = JsonDocument.Parse(jsonData);
                 if (jsonDoc.RootElement.ValueKind == JsonValueKind.Array)
                 {
-                    foreach(var record in jsonDoc.RootElement.EnumerateArray())
+                    foreach (var record in jsonDoc.RootElement.EnumerateArray())
                     {
                         records.Add(record.Clone());
                     }
                 }
             }
-            catch 
+            catch
             {
 
-                Console.WriteLine("No valid records found in JSON"); 
+                Console.WriteLine("No valid records found in JSON");
             }
         }
 
@@ -94,37 +94,39 @@ public class AIGenerator
     private string BuildSampleDataPrompt(int startingId, int recordCount, JsonDocument sampleDocument)
     {
         string sampleAsString = sampleDocument.RootElement.ToString();
-        string prompt = $@" <|start_header_id|>system<|end_header_id|>
-You are a precise JSON data generator. You must follow instructions exactly.
+
+        string prompt = $@"<|start_header_id|>system<|end_header_id|>
+You are a precise JSON data generator. Follow all instructions exactly.
 <|eot_id|><|start_header_id|>user<|end_header_id|>
-Generate exactly {recordCount} records of realistic sample data of foloowing structure:
+Generate exactly {recordCount} records of realistic sample data using the following structure:
 {sampleAsString}
 
-CRITICAL REQUIREMNETS:
-1. Output ONLY a valid JSON array starting with [ and ending with ]
-2. Generate exactly {recordCount} complete records 
-3. Each record MUST match the exact property names and types shown above 
+CRITICAL REQUIREMENTS:
+1. Output ONLY a valid JSON array starting with [ and ending with ].
+2. Generate exactly {recordCount} complete records.
+3. Each record MUST match the exact property names and types from the structure above.
 4. ALL fields must contain realistic, non-empty values:
-    — Names: Use realistic first and last names (e.g. , ""Muhammed Shaheem"", ""Sue Storm"")
-    — Addresses: Use realistic street addresses, cities, states, and zip code
-    - Phone numbers: Use valid format (e.g., ""+919567206946"")
-    - Email addresses: Use realistic emails (e.g., Muhammedshaheem@gmail.com)
-    - Dates: Use valid date formats (e.g., ""21-04-2003"")
-    - Numbers: Use realistic numbers non zero numbers unless a zero is called for 
-5. Do not ever include example datas in actual data generation. 
-6. Generate varied information, including using rare edge cases. Avoid repeating patterns within the response  
-7. DO NOT include any text, explanation, or markdown before or after the JSON array
-8. Ensure valid JSON syntax with proper commas between objects
-9. Make each record unique with different values
-10. If a property name requires a numeric Id, these records should start with the id of {startingId} and increment by 1 each time 
-11. If an Id or similar unique value is required. Ensure that it is unique, utilize the value of {startingId}
-12. If an Guid or similar unique value is required. Ensure that it is unique, utilize the value of {startingId}
-Your response must start with [ and end with ]
+   - Names: Use real first and last names.
+   - Addresses: Realistic street, city, state, and ZIP.
+   - Phone numbers: Valid formats, e.g., ""+919567206946"".
+   - Email: Realistic emails.
+   - Dates: Valid formats, e.g., ""21-04-2003"".
+   - Numbers: Realistic non-zero values unless zero is required.
+5. Do NOT include example placeholder values inside the actual data.
+6. Generate varied data. Avoid repeating patterns.
+7. Do NOT include any text, explanation, or markdown before or after the JSON.
+8. Ensure valid JSON: proper commas, quotes, and structure.
+9. Each record must be unique.
+10. If a property uses an integer Id, start at {startingId} and increment by 1.
+11. If a property requires any unique value (e.g., numeric ID), base uniqueness on {startingId}.
+12. If a property requires a Guid, it must be unique for each record.
+Your response must start with [ and end with ].
 
-<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-";
+<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+
         return prompt;
     }
+
 
     private string? ExtractJson(string response)
     {
